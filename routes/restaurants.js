@@ -111,4 +111,13 @@ router.post('/platdujour', (req, res) => {
     })
 });
 
+router.get('/getplatdujour', (req, res) => {
+    Restaurant.find()
+    //   .populate('restaurants')
+      .then((data) => {
+        
+        res.json({ result: true, platdujour: data[0].platdujour});
+      });
+     
+  });
 module.exports = router;
