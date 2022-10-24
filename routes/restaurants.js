@@ -33,7 +33,7 @@ router.post('/signup', (req, res) => {
         siren: restaurant.siren,
         website: restaurant.website,
         phone: restaurant.phone,
-        platsdujour: {},
+        platdujour: {},
         cuisine: restaurant.cuisine,
         atmosphere: restaurant.atmosphere,
         bookings: restaurant.bookings,
@@ -82,7 +82,7 @@ router.post('/signin', (req, res) => {
 
 
 //Ajouter un plat du jour
-router.post('/platsdujour', (req, res) => {
+router.post('/platdujour', (req, res) => {
   const pdj = req.body;
 
   if (!checkBody(req.body, ['token'])) {
@@ -90,23 +90,25 @@ router.post('/platsdujour', (req, res) => {
     return;
   }
 
-  Restaurant.findOne({ token: pdj.token })
-    .then(data => {
-      if (data) {
-        const dailyMeals = data.platsdujour;
-
-        const newMeal = {
-          name: pdj.name,
-          description: pdj.description,
-          src: pdj.src,
-          date: pdj.date,
-        }
-
-        dailyMeals.push(newMeal)
-
-        console.log(data)
+  Restaurant.updateOne(
+    { token: pdj.token },
+    {
+      platdujour:
+      {
+        name: pdj.name,
+        description: pdj.description,
+        src: pdj.src,
+        date: pdj.date,
       }
-    });
+    }
+  )
+    .then(() => {
+
+      Restaurant.find().then((data) => {
+        console.log(data);
+      })
+
+    })
 });
 
 module.exports = router;

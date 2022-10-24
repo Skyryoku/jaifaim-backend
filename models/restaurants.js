@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const platsdujourSchema = mongoose.Schema({
+const platdujourSchema = mongoose.Schema({
     name: String,
     description: String,
     src: String,
@@ -18,7 +18,7 @@ const restaurantSchema = mongoose.Schema({
     siren: String,
     website: String,
     phone: String,
-    platsdujour: [platsdujourSchema],
+    platdujour: platdujourSchema,
     cuisine: [String],
     atmosphere: [String],
     bookings: String,
