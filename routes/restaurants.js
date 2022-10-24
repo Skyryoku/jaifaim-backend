@@ -43,7 +43,7 @@ router.post('/signup', (req, res) => {
         socials: restaurant.socials,
         goals: restaurant.goals,
         qrCode: restaurant.qrCode
-        
+
       });
 
       newRestaurant.save().then((newDoc) => {
@@ -79,4 +79,33 @@ router.post('/signin', (req, res) => {
     }
   });
 });
+
+
+//Ajouter un plat du jour
+router.post('/platsdujour', (req, res) => {
+  const pdj = req.body;
+
+  if (!checkBody(req.body, ['token', 'platsdujour'])) {
+    res.json({ result: false, error: 'Missing or empty fields' });
+    return;
+  }
+
+  Restaurant.findOne({ token: pdj.token })
+    .then(data => {
+      if (data) {
+        const newPdj = new Platsdujour({
+          name: pdj.name,
+          description: pdj.description,
+          src: pdj.src,
+          date: pdj.date,
+          diets: pdj.diets,
+        });
+
+        newPdj.save().then((newDoc) => {
+          res.json({ result: true, token: newDoc.token });
+        });
+      }
+    });
+});
+
 module.exports = router;

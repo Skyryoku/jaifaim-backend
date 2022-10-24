@@ -14,6 +14,7 @@ const restaurantSchema = mongoose.Schema({
     email: String,
     name: String,
     password: String,
+    token: String,
     address: String,
     siren: String,
     website: String,
