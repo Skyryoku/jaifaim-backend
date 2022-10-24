@@ -123,6 +123,4 @@ router.get('/getplatdujour', (req, res) => {
       });
      
   });
-
-  
 module.exports = router;
