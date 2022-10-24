@@ -3,13 +3,12 @@ var router = express.Router();
 
 require('../models/connection');
 const User = require('../models/users');
+const Restaurant = require('../models/restaurants');
 const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-
-// Route Insscription
-
+//Route Inscription
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -45,8 +44,7 @@ router.post('/signup', (req, res) => {
   });
 });
 
-// Permettre au User de se connecter  
-
+// Permettre au User de se connecter
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -68,4 +66,13 @@ router.post('/signin', (req, res) => {
     }
   });
 });
+
+//Permettre au User de consulter les plats du jour
+router.get('/platsdujour', (req, res) => {
+  Restaurant.find()
+  .then(data => {
+    console.log(data);
+  });
+});
+
 module.exports = router;
