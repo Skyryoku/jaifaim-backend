@@ -6,6 +6,7 @@ const Restaurant = require('../models/restaurants');
 const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
+const Answer = require('../models/answers');
 
 
 // Route Insscription
@@ -125,5 +126,33 @@ router.post('/deleteplatdujour/:token', (req, res) => {
       })
     })
 });
+
+// Repondre à une question 
+
+router.post('/answer/:token', (req, res) => {
+    if (!checkBody(req.body, ['message'])) {
+      res.json({ result: false, error: 'Missing or empty fields' });
+    } else {
+      Restaurant.findOne({ token: req.params.token }).then((data) => {
+        if (data) {
+          const newAnswer = new Answer({
+            date: req.body.date,
+            message: req.body.message,
+          });
+          newAnswer.save().then((data) => {
+            res.json({
+              result: true,
+              answer: Answer,
+            });
+          });
+        } else {
+          res.json({
+            result: false,
+            error: "Pas de restaurants trouvé",
+          });
+        }
+      });
+    }
+  });
 
 module.exports = router;
