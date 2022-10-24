@@ -5,8 +5,6 @@ const badgeSchema = mongoose.Schema({
     name: String,
     restaurants: { type: mongoose.Schema.Types.ObjectId, ref: 'restaurants'},
     source: String
-
-   
     
   });
   
