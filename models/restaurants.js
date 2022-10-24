@@ -1,4 +1,3 @@
-const { hash } = require('bcrypt');
 const mongoose = require('mongoose');
 
 const platsdujourSchema = mongoose.Schema({
@@ -6,7 +5,7 @@ const platsdujourSchema = mongoose.Schema({
     description: String,
     src: String,
     date: Date,
-    diets: String,
+    diets: [String],
 });
 
 const restaurantSchema = mongoose.Schema({
@@ -19,15 +18,15 @@ const restaurantSchema = mongoose.Schema({
     siren: String,
     website: String,
     phone: String,
-    platsdujour: platsdujourSchema,
-    cuisine: String,
-    atmosphere: String,
+    platsdujour: [platsdujourSchema],
+    cuisine: [String],
+    atmosphere: [String],
     bookings: String,
-    miscellaneous: String,
+    miscellaneous: [String],
     bioShort: String,
     bioLong: String,
     socials: Object,
-    goals: String,
+    goals: [String],
     qrcode: Object,
   });
   

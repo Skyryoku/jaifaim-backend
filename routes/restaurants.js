@@ -33,7 +33,7 @@ router.post('/signup', (req, res) => {
         siren: restaurant.siren,
         website: restaurant.website,
         phone: restaurant.phone,
-        platdujour: {},
+        platsdujour: {},
         cuisine: restaurant.cuisine,
         atmosphere: restaurant.atmosphere,
         bookings: restaurant.bookings,
@@ -85,7 +85,7 @@ router.post('/signin', (req, res) => {
 router.post('/platsdujour', (req, res) => {
   const pdj = req.body;
 
-  if (!checkBody(req.body, ['token', 'platsdujour'])) {
+  if (!checkBody(req.body, ['token'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
@@ -93,17 +93,18 @@ router.post('/platsdujour', (req, res) => {
   Restaurant.findOne({ token: pdj.token })
     .then(data => {
       if (data) {
-        const newPdj = new Platsdujour({
+        const dailyMeals = data.platsdujour;
+
+        const newMeal = {
           name: pdj.name,
           description: pdj.description,
           src: pdj.src,
           date: pdj.date,
-          diets: pdj.diets,
-        });
+        }
 
-        newPdj.save().then((newDoc) => {
-          res.json({ result: true, token: newDoc.token });
-        });
+        dailyMeals.push(newMeal)
+
+        console.log(data)
       }
     });
 });

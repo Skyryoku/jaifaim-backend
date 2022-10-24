@@ -19,8 +19,8 @@ const userSchema = mongoose.Schema({
   collections: collectionsSchema,
   password: String,
   token: String,
-  diets: String,
-  intolerances: String,
+  diets: [String],
+  intolerances: [String],
   profilGourmand: String,
   badges: [{ type: mongoose.Schema.Types.ObjectId, ref: 'badges' }],
 });
