@@ -112,15 +112,30 @@ router.post('/platdujour', (req, res) => {
 });
 
 router.get('/getplatdujour', (req, res) => {
-    Restaurant.find()
+  Restaurant.find()
     //   .populate('restaurants')
-      .then((data) => {
-        let dailyMeals = [];
-        for (let i = 0; i < data.length; i++) {
-            dailyMeals.push(data[i].platdujour) 
-        }
-        res.json({ result: true, platsdujour: dailyMeals});
-      });
-     
-  });
+    .then((data) => {
+      let dailyMeals = [];
+      for (let i = 0; i < data.length; i++) {
+        dailyMeals.push(data[i].platdujour)
+      }
+      res.json({ result: true, platsdujour: dailyMeals });
+    });
+
+});
+
+router.post('/deleteplatdujour/:token', (req, res) => {
+  Restaurant.updateOne(
+    { token: req.params.token},
+    { platdujour: {}}
+  )
+  .then(() => {
+    Restaurant.find().then((data) => {
+      res.json({ result: true, data });
+    })
+  })
+});
+
+
+
 module.exports = router;
