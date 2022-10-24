@@ -68,11 +68,16 @@ router.post('/signin', (req, res) => {
 });
 
 //Permettre au User de consulter les plats du jour
-router.get('/platsdujour', (req, res) => {
+router.get('/getplatsdujour', (req, res) => {
   Restaurant.find()
-  .then(data => {
-    console.log(data);
-  });
+    .then((data) => {
+      let dailyMeals = [];
+      for (let i = 0; i < data.length; i++) {
+        dailyMeals.push(data[i].platdujour)
+      }
+      res.json({ result: true, platsdujour: dailyMeals });
+    });
+
 });
 
 module.exports = router;

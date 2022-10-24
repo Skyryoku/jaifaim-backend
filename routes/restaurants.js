@@ -82,7 +82,7 @@ router.post('/signin', (req, res) => {
 
 
 //Ajouter un plat du jour
-router.post('/platdujour', (req, res) => {
+router.post('/addplatdujour', (req, res) => {
   const pdj = req.body;
 
   if (!checkBody(req.body, ['token'])) {
@@ -99,15 +99,30 @@ router.post('/platdujour', (req, res) => {
         description: pdj.description,
         src: pdj.src,
         date: pdj.date,
+        diets: pdj.diets,
       }
     }
   )
     .then(() => {
 
       Restaurant.find().then((data) => {
-        console.log(data);
+        res.json({ result: true, token: data });
       })
 
+    })
+});
+
+
+//Supprimer un plat du jour
+router.post('/deleteplatdujour/:token', (req, res) => {
+  Restaurant.updateOne(
+    { token: req.params.token },
+    { platdujour: {}}
+  )
+    .then(() => {
+      Restaurant.find().then((data) => {
+        res.json({ result: true, data });
+      })
     })
 });
 
