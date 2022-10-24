@@ -8,7 +8,7 @@ const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
 
-// Route Insscription
+// Route Inscription
 
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {

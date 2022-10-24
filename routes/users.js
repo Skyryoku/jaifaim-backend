@@ -4,6 +4,7 @@ var router = express.Router();
 require('../models/connection');
 const User = require('../models/users');
 const Restaurant = require('../models/restaurants');
+const Question = require('../models/questions');
 const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
@@ -11,7 +12,7 @@ const bcrypt = require('bcrypt');
 //Route Inscription
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
+    res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
     return;
   }
 
@@ -47,7 +48,7 @@ router.post('/signup', (req, res) => {
 // Permettre au User de se connecter
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
+    res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
     return;
   }
 
@@ -78,6 +79,30 @@ router.get('/getplatsdujour', (req, res) => {
       res.json({ result: true, platsdujour: dailyMeals });
     });
 
+});
+
+
+//Permettre au User de poser une question
+router.post('/askquestion/:token', async (req, res) => {
+  //on récupère l'id du user
+  let user = await User.findOne({ user: req.body.token });
+  //on récupère l'id du restaurant via les params
+  let restaurant = await Restaurant.findOne({ user: req.params.token });
+
+  //on crée une nouvelle question
+  const newQuestion = new Question({
+    user: user.id,
+    restaurants: restaurant.id,
+    date: req.body.date,
+    token: uid2(32),
+    message: req.body.message,
+  });
+
+  newQuestion.save().then(() => {
+    Question.find().then(question => {
+      res.json({ result: true, question });
+    });
+  });
 });
 
 module.exports = router;
