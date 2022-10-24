@@ -10,14 +10,14 @@ const Answer = require('../models/answers');
 
 
 // Route Inscription
-
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
 
-  // On verifie si l'user est déja enregistré 
+  // On verifie si l'user est déja enregistré
+
   Restaurant.findOne({ username: req.body.username }).then((data) => {
     const restaurant = req.body;
 
@@ -57,7 +57,8 @@ router.post('/signup', (req, res) => {
   });
 });
 
-// Permettre au User de se connecter  
+
+// Permettre au User de se connecter
 
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
@@ -83,6 +84,7 @@ router.post('/signin', (req, res) => {
 
 
 //Ajouter un plat du jour
+
 router.post('/addplatdujour', (req, res) => {
   const pdj = req.body;
 
@@ -115,6 +117,7 @@ router.post('/addplatdujour', (req, res) => {
 
 
 //Supprimer un plat du jour
+
 router.post('/deleteplatdujour/:token', (req, res) => {
   Restaurant.updateOne(
     { token: req.params.token },
@@ -126,6 +129,7 @@ router.post('/deleteplatdujour/:token', (req, res) => {
       })
     })
 });
+
 
 // Repondre à une question 
 

@@ -10,6 +10,7 @@ const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
 //Route Inscription
+
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
@@ -45,7 +46,9 @@ router.post('/signup', (req, res) => {
   });
 });
 
+
 // Permettre au User de se connecter
+
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
@@ -68,7 +71,9 @@ router.post('/signin', (req, res) => {
   });
 });
 
+
 //Permettre au User de consulter les plats du jour
+
 router.get('/getplatsdujour', (req, res) => {
   Restaurant.find()
     .then((data) => {
@@ -83,6 +88,7 @@ router.get('/getplatsdujour', (req, res) => {
 
 
 //Permettre au User de poser une question
+
 router.post('/askquestion/:token', async (req, res) => {
 
   //On vérifie que le formulaire est rempli
