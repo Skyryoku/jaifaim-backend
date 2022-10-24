@@ -115,8 +115,11 @@ router.get('/getplatdujour', (req, res) => {
     Restaurant.find()
     //   .populate('restaurants')
       .then((data) => {
-        
-        res.json({ result: true, platdujour: data[0].platdujour});
+        let dailyMeals = [];
+        for (let i = 0; i < data.length; i++) {
+            dailyMeals.push(data[i].platdujour) 
+        }
+        res.json({ result: true, platsdujour: dailyMeals});
       });
      
   });
