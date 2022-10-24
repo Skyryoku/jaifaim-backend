@@ -18,15 +18,21 @@ router.post('/signup', (req, res) => {
 
   // On verifie si l'user est déja enregistré 
   User.findOne({ username: req.body.username }).then((data) => {
+    const user = req.body;
+
     if (data === null) {
-      const hash = bcrypt.hashSync(req.body.password, 10);
+      const hash = bcrypt.hashSync(user.password, 10);
 
       const newUser = new User({
-        firstname: req.body.firstname,
-        username: req.body.username,
+        username: user.username,
+        email: user.email,
+        firstname: user.firstname,
         password: hash,
         token: uid2(32),
-        
+        diets: user.diets,
+        intolerances: user.intolerances,
+        profilGourmand: user.profilGourmand,
+        badges: [],
       });
 
       newUser.save().then((newDoc) => {

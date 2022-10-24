@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
   diets: String,
   intolerances: String,
   profilGourmand: String,
-  badges:{ type: mongoose.Schema.Types.ObjectId, ref: 'badges'},
+  badges: [{ type: mongoose.Schema.Types.ObjectId, ref: 'badges'}],
   
 });
 
