@@ -113,7 +113,7 @@ router.post('/platdujour', (req, res) => {
 
 router.get('/getplatdujour', (req, res) => {
     Restaurant.find()
-    //   .populate('restaurants')
+    
       .then((data) => {
         let dailyMeals = [];
         for (let i = 0; i < data.length; i++) {
@@ -123,4 +123,6 @@ router.get('/getplatdujour', (req, res) => {
       });
      
   });
+
+  
 module.exports = router;
