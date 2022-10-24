@@ -84,12 +84,18 @@ router.get('/getplatsdujour', (req, res) => {
 
 //Permettre au User de poser une question
 router.post('/askquestion/:token', async (req, res) => {
-  //on récupère l'id du user
+
+  //On vérifie que le formulaire est rempli
+  if (!checkBody(req.body, ['message'])) {
+    res.json({ result: false, error: 'Missing or empty fields' });
+  }
+
+  //on récupère l'id du user, on attend d'obtenir la réponse
   let user = await User.findOne({ user: req.body.token });
-  //on récupère l'id du restaurant via les params
+  //on récupère l'id du restaurant via les params, on attend d'obtenir la réponse
   let restaurant = await Restaurant.findOne({ user: req.params.token });
 
-  //on crée une nouvelle question
+  //on crée une nouvelle question en renseignant les deux id
   const newQuestion = new Question({
     user: user.id,
     restaurants: restaurant.id,
