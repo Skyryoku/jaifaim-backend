@@ -80,6 +80,16 @@ router.post('/signin', (req, res) => {
   });
 });
 
+
+// POST /SHOW RESTAURANT DATA
+
+router.post('/restaurant', (req, res) => {
+  Restaurant.findOne({ username: req.body.username }).then((data) => {
+    res.json({ result: true, data });
+  })
+});
+
+
 //Ajouter un plat du jour
 
 router.post('/addplatdujour', (req, res) => {
