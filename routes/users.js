@@ -9,10 +9,14 @@ const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-//Route Inscription
+
+// POST /INSCRIPTION USER
 
 router.post('/signup', (req, res) => {
+
+  // On s'assure que les champs nécessaires soient bien remplis
   if (!checkBody(req.body, ['username', 'password'])) {
+    //si non : message d'erreur
     res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
     return;
   }
@@ -21,15 +25,18 @@ router.post('/signup', (req, res) => {
   User.findOne({ username: req.body.username }).then((data) => {
     const user = req.body;
 
+    //si non, on l'inscrit
     if (data === null) {
+      //on stocke dans une constante la méthode pour crypter le password
       const hash = bcrypt.hashSync(user.password, 10);
 
+      //on crée un objet pour les informations du nouvel utilisateur 
       const newUser = new User({
         username: user.username,
         email: user.email,
         firstname: user.firstname,
-        password: hash,
-        token: uid2(32),
+        password: hash, //password cryspé
+        token: uid2(32), //token généré
         diets: user.diets,
         intolerances: user.intolerances,
         profilGourmand: user.profilGourmand,
@@ -40,57 +47,68 @@ router.post('/signup', (req, res) => {
         res.json({ result: true, token: newDoc.token });
       });
     } else {
-      // S'il existe déjà
+      // message d'erreur si l'utilisateur existe déjà
       res.json({ result: false, error: 'Vous avez déjà un compte' });
     }
   });
 });
 
 
-// Permettre au User de se connecter
+// POST /CONNEXION USER
 
 router.post('/signin', (req, res) => {
+  // On s'assure que les champs nécessaires soient bien remplis
   if (!checkBody(req.body, ['username', 'password'])) {
+    //si non : message d'erreur
     res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
     return;
   }
 
+  // On verifie si l'user est bien enregistré 
   User.findOne({ username: req.body.username }).then((data) => {
+    //si données :
     if (data) {
+      //on vérifie son password
       if (bcrypt.compareSync(req.body.password, data.password)) {
         res.json({ result: true, token: data.token });
-      } else {
-        res.json({
-          result: false,
-          error: 'Identifiant ou mot de passe incorrect',
-        });
       }
-    } else {
+      //si non, message d'erreur
+      else {
+        res.json({ result: false, error: 'Identifiant ou mot de passe incorrect' });
+      }
+    }
+
+    //si pas de données :
+    else {
       res.json({ result: false, error: 'Utilisateur introuvable' });
     }
   });
 });
 
 
-//Permettre au User de consulter les plats du jour
+// GET /USER AFFICHE LES PLATS DU JOUR
 
 router.get('/getplatsdujour', (req, res) => {
+  //on cherche le bon restaurant
   Restaurant.find()
     .then((data) => {
       let dailyMeals = [];
+      
+      //on boucle sur data pour récupérer tous les plats du jour
       for (let i = 0; i < data.length; i++) {
         dailyMeals.push(data[i].platdujour)
       }
+
+      //on affiche les plats
       res.json({ result: true, platsdujour: dailyMeals });
     });
 
 });
 
 
-//Permettre au User de poser une question
+// POST /USER POSE UNE QUESTION
 
 router.post('/askquestion/:token', async (req, res) => {
-
   //On vérifie que le formulaire est rempli
   if (!checkBody(req.body, ['message'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -98,6 +116,7 @@ router.post('/askquestion/:token', async (req, res) => {
 
   //on récupère l'id du user, on attend d'obtenir la réponse
   let user = await User.findOne({ user: req.body.token });
+  
   //on récupère l'id du restaurant via les params, on attend d'obtenir la réponse
   let restaurant = await Restaurant.findOne({ user: req.params.token });
 
