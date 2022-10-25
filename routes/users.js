@@ -86,6 +86,15 @@ router.post('/signin', (req, res) => {
 });
 
 
+// POST /SHOW USER DATA
+
+router.post('/user', (req, res) => {
+  User.findOne({ username: req.body.username }).then((data) => {
+    res.json({ result: true, data });
+  })
+});
+
+
 // GET /USER AFFICHE LES PLATS DU JOUR
 
 router.get('/getplatsdujour', (req, res) => {
@@ -93,7 +102,7 @@ router.get('/getplatsdujour', (req, res) => {
   Restaurant.find()
     .then((data) => {
       let dailyMeals = [];
-      
+
       //on boucle sur data pour récupérer tous les plats du jour
       for (let i = 0; i < data.length; i++) {
         dailyMeals.push(data[i].platdujour)
@@ -116,7 +125,7 @@ router.post('/askquestion/:token', async (req, res) => {
 
   //on récupère l'id du user, on attend d'obtenir la réponse
   let user = await User.findOne({ user: req.body.token });
-  
+
   //on récupère l'id du restaurant via les params, on attend d'obtenir la réponse
   let restaurant = await Restaurant.findOne({ user: req.params.token });
 
