@@ -132,34 +132,6 @@ router.post('/deleteplatdujour/:token', (req, res) => {
 });
 
 
-// Repondre à une question 
-
-// router.post('/answer/:token', (req, res) => {
-//     if (!checkBody(req.body, ['message'])) {
-//       res.json({ result: false, error: 'Missing or empty fields' });
-//     } else {
-//       Restaurant.findOne({ token: req.params.token }).then((data) => {
-//         if (data) {
-//           const newAnswer = new Answer({
-//             date: req.body.date,
-//             message: req.body.message,
-//           });
-//           newAnswer.save().then((data) => {
-//             res.json({
-//               result: true,
-//               answer: Answer,
-//             });
-//           });
-//         } else {
-//           res.json({
-//             result: false,
-//             error: "Pas de restaurants trouvé",
-//           });
-//         }
-//       });
-//     }
-//   });
-
 router.post('/answer/:token', async (req, res) => {
 
     //On vérifie que le formulaire est rempli
