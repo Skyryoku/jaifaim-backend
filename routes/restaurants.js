@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt');
 const Answer = require('../models/answers');
 const Question = require('../models/questions');
 
-
 // Route Inscription
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
@@ -31,11 +30,11 @@ router.post('/signup', (req, res) => {
         name: restaurant.name,
         password: hash,
         token: uid2(32),
-        adress: restaurant.adress,
+        address: restaurant.address,
         siren: restaurant.siren,
         website: restaurant.website,
         phone: restaurant.phone,
-        platdujour: {},
+        platsdujour: [],
         cuisine: restaurant.cuisine,
         atmosphere: restaurant.atmosphere,
         bookings: restaurant.bookings,
@@ -44,8 +43,7 @@ router.post('/signup', (req, res) => {
         bioLong: restaurant.bioLong,
         socials: restaurant.socials,
         goals: restaurant.goals,
-        qrCode: restaurant.qrCode
-
+        qrcode: restaurant.qrCode,
       });
 
       newRestaurant.save().then((newDoc) => {
@@ -57,7 +55,6 @@ router.post('/signup', (req, res) => {
     }
   });
 });
-
 
 // Permettre au User de se connecter
 
@@ -83,82 +80,77 @@ router.post('/signin', (req, res) => {
   });
 });
 
-
 //Ajouter un plat du jour
 
 router.post('/addplatdujour', (req, res) => {
-  const pdj = req.body;
-
+  const data = req.body;
+  const { name, description, src, date, diets, token } = data;
   if (!checkBody(req.body, ['token'])) {
-    res.json({ result: false, error: 'Missing or empty fields' });
-    return;
+    res.json({
+      result: false,
+      error: 'Missing or empty fields',
+    });
   }
-
   Restaurant.updateOne(
-    { token: pdj.token },
+    { token },
     {
-      platdujour:
-      {
-        name: pdj.name,
-        description: pdj.description,
-        src: pdj.src,
-        date: pdj.date,
-        diets: pdj.diets,
-      }
+      $push: {
+        platsdujour: {
+          name,
+          description,
+          src,
+          date,
+          diets,
+        },
+      },
     }
-  )
-    .then(() => {
-
-      Restaurant.find().then((data) => {
-        res.json({ result: true, token: data });
+  ).then(() => {
+    Restaurant.findOne({ token }).then((restaurant) =>
+      res.json({
+        result: true,
+        platsdujour: restaurant.platsdujour,
       })
-
-    })
+    );
+  });
 });
-
 
 //Supprimer un plat du jour
 
 router.post('/deleteplatdujour/:token', (req, res) => {
-  Restaurant.updateOne(
-    { token: req.params.token },
-    { platdujour: {}}
-  )
-    .then(() => {
+  Restaurant.updateOne({ token: req.params.token }, { platsdujour: [] }).then(
+    () => {
       Restaurant.find().then((data) => {
         res.json({ result: true, data });
-      })
-    })
+      });
+    }
+  );
 });
 
-
 router.post('/answer/:token', async (req, res) => {
+  //On vérifie que le formulaire est rempli
+  if (!checkBody(req.body, ['message'])) {
+    res.json({ result: false, error: 'Missing or empty fields' });
+  }
 
-    //On vérifie que le formulaire est rempli
-    if (!checkBody(req.body, ['message'])) {
-      res.json({ result: false, error: 'Missing or empty fields' });
-    }
-  
-    //on récupère l'id du restaurant, on attend d'obtenir la réponse
-    let restaurant = await Restaurant.findOne({ restaurant: req.body.token });
-    //on récupère l'id de la question via les params, on attend d'obtenir la réponse
-    let question = await Question.findOne({ question: req.params.token });
-  
-    //on crée une nouvelle question en renseignant les deux id
-    const newAnswer = new Answer({
-      restaurant: restaurant.id,
-      question: question.id,
-      date: req.body.date,
-      token: uid2(32),
-      message: req.body.message,
-    });
-  
-    newAnswer.save().then(() => {
-      Answer.find().then(question => {
-        res.json({ result: true, question });
-      });
+  //on récupère l'id du restaurant, on attend d'obtenir la réponse
+  let restaurant = await Restaurant.findOne({ restaurant: req.body.token });
+  //on récupère l'id de la question via les params, on attend d'obtenir la réponse
+  let question = await Question.findOne({ question: req.params.token });
+
+  //on crée une nouvelle question en renseignant les deux id
+  const newAnswer = new Answer({
+    restaurant: restaurant.id,
+    question: question.id,
+    date: req.body.date,
+    token: uid2(32),
+    message: req.body.message,
+  });
+
+  newAnswer.save().then(() => {
+    Answer.find().then((question) => {
+      res.json({ result: true, question });
     });
   });
-  
+});
 
 module.exports = router;
