@@ -102,10 +102,12 @@ router.get('/getplatsdujour', (req, res) => {
   Restaurant.find()
     .then((data) => {
       let dailyMeals = [];
-
       //on boucle sur data pour récupérer tous les plats du jour
+
       for (let i = 0; i < data.length; i++) {
-        dailyMeals.push(data[i].platdujour)
+        if (data[i].platsdujour.length > 0) {
+          dailyMeals.push(data[i].platsdujour)
+        }
       }
 
       //on affiche les plats
