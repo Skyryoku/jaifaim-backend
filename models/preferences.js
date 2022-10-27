@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const preferenceSchema = mongoose.Schema({
-  cuisine: [String],
   atmosphere: [String],
-  diete: [String],
-  intolerances: [String],
-  profilGourmand: [String],
   bookings: [String],
+  cuisine: [String],
+  diets: [{ name: String, description: String }],
+  intolerances: [String],
   miscellaneous: [String],
+  profilGourmand: [String],
 });
 
 const Preference = mongoose.model('preferences', preferenceSchema);
