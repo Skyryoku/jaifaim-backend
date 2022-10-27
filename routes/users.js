@@ -98,12 +98,30 @@ router.post('/user', (req, res) => {
 // GET /USER AFFICHE LES RESTAURANTS SI PLATS DU JOUR
 
 router.get('/getplatsdujour', (req, res) => {
-  //on cherche le bon restaurant
+  //on trouve les restaurants ayant un plat du jour
   Restaurant.find({ platsdujour: { $exists: true, $type: 'array', $ne: [] } })
     .then((data) => {
-      res.json({ result: true, restaurants: data });
-    });
+      //on crée un tableau 
+      const dailyMeals = [];
 
+      if (data !== null) {
+        for (const restaurant of data) {
+          for (const dailyMeal of restaurant.platsdujour) {
+            //on crée des objets comprenant les données à récupérer
+            let pdj = {
+              restaurant: restaurant.name,
+              meal: dailyMeal.name,
+              src: dailyMeal.src,
+              date: dailyMeal.date,
+            }
+            //on les push dans le tableau
+            dailyMeals.push(pdj)
+          }
+        }
+      }
+
+      res.json({ result: true, platsdujour: dailyMeals });
+    });
 });
 
 
