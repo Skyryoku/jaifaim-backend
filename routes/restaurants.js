@@ -80,21 +80,19 @@ router.post('/signin', (req, res) => {
   });
 });
 
-
 // POST /SHOW RESTAURANT DATA
 
 router.post('/restaurant', (req, res) => {
   Restaurant.findOne({ username: req.body.username }).then((data) => {
     res.json({ result: true, data });
-  })
+  });
 });
-
 
 //Ajouter un plat du jour
 
 router.post('/addplatdujour', (req, res) => {
   const data = req.body;
-  const { name, description, src, date, diets, token } = data;
+  const { description, diets, name, src, token } = data;
   if (!checkBody(req.body, ['token'])) {
     res.json({
       result: false,
@@ -106,11 +104,11 @@ router.post('/addplatdujour', (req, res) => {
     {
       $push: {
         platsdujour: {
-          name,
+          date: new Date(),
           description,
-          src,
-          date,
           diets,
+          name,
+          src,
         },
       },
     }
