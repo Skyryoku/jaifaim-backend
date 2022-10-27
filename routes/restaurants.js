@@ -118,7 +118,7 @@ router.post('/addplatdujour', (req, res) => {
     Restaurant.findOne({ token }).then((restaurant) =>
       res.json({
         result: true,
-        platsdujour: restaurant.platsdujour,
+        restaurant: restaurant.platsdujour,
       })
     );
   });

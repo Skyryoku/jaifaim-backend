@@ -95,7 +95,7 @@ router.post('/user', (req, res) => {
 });
 
 
-// GET /USER AFFICHE LES PLATS DU JOUR
+// GET /USER AFFICHE LES RESTAURANTS SI PLATS DU JOUR
 
 router.get('/getplatsdujour', (req, res) => {
   //on cherche le bon restaurant
@@ -110,8 +110,11 @@ router.get('/getplatsdujour', (req, res) => {
         }
       }
 
-      //on affiche les plats
-      res.json({ result: true, platsdujour: dailyMeals });
+      //si plats du jour, on affiche le restaurant
+      if (dailyMeals.length > 0) {
+        res.json({ result: true, restaurants: data });
+      }
+
     });
 
 });
