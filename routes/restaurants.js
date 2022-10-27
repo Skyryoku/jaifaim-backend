@@ -1,13 +1,19 @@
 var express = require('express');
 var router = express.Router();
-
+// MODELS
 require('../models/connection');
 const Restaurant = require('../models/restaurants');
-const { checkBody } = require('../modules/checkBody');
-const uid2 = require('uid2');
-const bcrypt = require('bcrypt');
 const Answer = require('../models/answers');
 const Question = require('../models/questions');
+// SECURE AUTHENTICATION
+const uid2 = require('uid2');
+const bcrypt = require('bcrypt');
+const uniqid = require('uniqid');
+// CLOUDINARY
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
+// OTHERS
+const { checkBody } = require('../modules/checkBody');
 
 // Route Inscription
 router.post('/signup', (req, res) => {
@@ -88,9 +94,24 @@ router.post('/restaurant', (req, res) => {
   });
 });
 
-//Ajouter un plat du jour
+// POST une photo de plat du jour sur cloudinary, retourne une URI cloudinary
+router.post('/platdujour/photo/create', async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  const resultMove = await req.files.photoFromFront.mv(photoPath);
 
-router.post('/addplatdujour', (req, res) => {
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath, {
+      folder: 'bref-jai-faim',
+    });
+    fs.unlinkSync(photoPath);
+    res.json({ result: true, url: resultCloudinary.secure_url });
+  } else {
+    res.json({ result: false, error: resultMove });
+  }
+});
+
+// POST le plat du jour d'un restaurant identifié par son token en DB, retourne rien
+router.post('/platdujour/create', (req, res) => {
   const data = req.body;
   const { description, diets, name, src, token } = data;
   if (!checkBody(req.body, ['token'])) {
@@ -112,14 +133,7 @@ router.post('/addplatdujour', (req, res) => {
         },
       },
     }
-  ).then(() => {
-    Restaurant.findOne({ token }).then((restaurant) =>
-      res.json({
-        result: true,
-        restaurant: restaurant.platsdujour,
-      })
-    );
-  });
+  ).then(res.json({ result: true }));
 });
 
 //Supprimer un plat du jour
