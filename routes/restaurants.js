@@ -104,9 +104,17 @@ router.post('/platdujour/photo/create', async (req, res) => {
       folder: 'bref-jai-faim',
     });
     fs.unlinkSync(photoPath);
-    res.json({ result: true, url: resultCloudinary.secure_url });
+    res.json({
+      result: true,
+      log: 'Photo du plat du jour téléchargée sur Cloudinary avec succès',
+      url: resultCloudinary.secure_url,
+    });
   } else {
-    res.json({ result: false, error: resultMove });
+    res.json({
+      result: false,
+      log: 'Echec du téléchargement de la photo du plat du jour vers Cloudinary, .error pour détails',
+      error: resultMove,
+    });
   }
 });
 
@@ -133,7 +141,12 @@ router.post('/platdujour/create', (req, res) => {
         },
       },
     }
-  ).then(res.json({ result: true }));
+  ).then(
+    res.json({
+      result: true,
+      log: 'Plat du jour ajouté en base de données avec succès',
+    })
+  );
 });
 
 //Supprimer un plat du jour
