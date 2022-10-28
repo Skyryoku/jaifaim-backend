@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const addressSchema = mongoose.Schema({
+  streetNumber: String,
+  streetType: String,
+  streetName: String,
+  postCode: Number,
+  city: String,
+});
+
 const platdujourSchema = mongoose.Schema({
   name: String,
   description: String,
@@ -14,7 +22,7 @@ const restaurantSchema = mongoose.Schema({
   name: String,
   password: String,
   token: String,
-  address: String,
+  address: addressSchema,
   siren: String,
   website: String,
   phone: String,
