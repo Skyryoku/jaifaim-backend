@@ -1,27 +1,28 @@
 var express = require('express');
 var router = express.Router();
-
+// IMPORTS MODELES
 require('../models/connection');
 const User = require('../models/users');
 const Restaurant = require('../models/restaurants');
 const Question = require('../models/questions');
-const { checkBody } = require('../modules/checkBody');
+// IMPORTS MODULES
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
-
+const { checkBody } = require('../modules/checkBody');
 
 // POST /INSCRIPTION USER
-
 router.post('/signup', (req, res) => {
-
   // On s'assure que les champs nécessaires soient bien remplis
   if (!checkBody(req.body, ['username', 'password'])) {
     //si non : message d'erreur
-    res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
+    res.json({
+      result: false,
+      error: 'Les champs ne sont pas correctement remplis',
+    });
     return;
   }
 
-  // On verifie si l'user est déja enregistré 
+  // On verifie si l'user est déja enregistré
   User.findOne({ username: req.body.username }).then((data) => {
     const user = req.body;
 
@@ -30,7 +31,7 @@ router.post('/signup', (req, res) => {
       //on stocke dans une constante la méthode pour crypter le password
       const hash = bcrypt.hashSync(user.password, 10);
 
-      //on crée un objet pour les informations du nouvel utilisateur 
+      //on crée un objet pour les informations du nouvel utilisateur
       const newUser = new User({
         username: user.username,
         email: user.email,
@@ -53,18 +54,19 @@ router.post('/signup', (req, res) => {
   });
 });
 
-
 // POST /CONNEXION USER
-
 router.post('/signin', (req, res) => {
   // On s'assure que les champs nécessaires soient bien remplis
   if (!checkBody(req.body, ['username', 'password'])) {
     //si non : message d'erreur
-    res.json({ result: false, error: 'Les champs ne sont pas correctement remplis' });
+    res.json({
+      result: false,
+      error: 'Les champs ne sont pas correctement remplis',
+    });
     return;
   }
 
-  // On verifie si l'user est bien enregistré 
+  // On verifie si l'user est bien enregistré
   User.findOne({ username: req.body.username }).then((data) => {
     //si données :
     if (data) {
@@ -74,7 +76,10 @@ router.post('/signin', (req, res) => {
       }
       //si non, message d'erreur
       else {
-        res.json({ result: false, error: 'Identifiant ou mot de passe incorrect' });
+        res.json({
+          result: false,
+          error: 'Identifiant ou mot de passe incorrect',
+        });
       }
     }
 
@@ -85,48 +90,66 @@ router.post('/signin', (req, res) => {
   });
 });
 
-
 // POST /SHOW USER DATA
-
 router.post('/user', (req, res) => {
   User.findOne({ username: req.body.username }).then((data) => {
     res.json({ result: true, data });
-  })
+  });
 });
-
 
 // GET /USER AFFICHE LES RESTAURANTS SI PLATS DU JOUR
-
 router.get('/getplatsdujour', (req, res) => {
   //on trouve les restaurants ayant un plat du jour
-  Restaurant.find({ platsdujour: { $exists: true, $type: 'array', $ne: [] } })
-    .then((data) => {
-      //on crée un tableau 
-      const dailyMeals = [];
+  Restaurant.find({
+    platsdujour: { $exists: true, $type: 'array', $ne: [] },
+  }).then((data) => {
+    //on crée un tableau
+    const dailyMeals = [];
 
-      if (data !== null) {
-        for (const restaurant of data) {
-          for (const dailyMeal of restaurant.platsdujour) {
-            //on crée des objets comprenant les données à récupérer
-            let pdj = {
-              restaurant: restaurant.name,
-              meal: dailyMeal.name,
-              src: dailyMeal.src,
-              date: dailyMeal.date,
-            }
-            //on les push dans le tableau
-            dailyMeals.push(pdj)
-          }
+    if (data !== null) {
+      for (const restaurant of data) {
+        for (const dailyMeal of restaurant.platsdujour) {
+          //on crée des objets comprenant les données à récupérer
+          let pdj = {
+            restaurant: restaurant.name,
+            meal: dailyMeal.name,
+            src: dailyMeal.src,
+            date: dailyMeal.date,
+          };
+          //on les push dans le tableau
+          dailyMeals.push(pdj);
         }
       }
+    }
 
-      res.json({ result: true, platsdujour: dailyMeals });
-    });
+    res.json({ result: true, platsdujour: dailyMeals });
+  });
 });
 
+// GET plats du jour : pour tous les restaurants de la DB, retourne son nom, son adresse,
+// ses coordonnées, et son dernier plat. Utilisé dans mapScreen.js
+router.get('/platsdujour/read/', (req, res) => {
+  Restaurant.find({}, 'address coordinates name platsdujour').then((data) => {
+    const restaurants = [];
+
+    data.map((restaurant) => {
+      const { address, coordinates, name, platsdujour } = restaurant;
+      restaurants.push({
+        address,
+        coordinates,
+        dernierPlat: platsdujour[platsdujour.length - 1],
+        name,
+      });
+    });
+
+    res.json({
+      result: true,
+      restaurants: restaurants,
+    });
+  });
+});
 
 // POST /USER POSE UNE QUESTION
-
 router.post('/askquestion/:token', async (req, res) => {
   //On vérifie que le formulaire est rempli
   if (!checkBody(req.body, ['message'])) {
@@ -149,7 +172,7 @@ router.post('/askquestion/:token', async (req, res) => {
   });
 
   newQuestion.save().then(() => {
-    Question.find().then(question => {
+    Question.find().then((question) => {
       res.json({ result: true, question });
     });
   });
