@@ -37,6 +37,7 @@ router.post('/signup', (req, res) => {
         password: hash,
         token: uid2(32),
         address: restaurant.address,
+        coordinates: restaurant.coordinates,
         siren: restaurant.siren,
         website: restaurant.website,
         phone: restaurant.phone,

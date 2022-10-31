@@ -15,6 +15,10 @@ const platdujourSchema = mongoose.Schema({
   date: Date,
   diets: [String],
 });
+const coordinatesSchema = mongoose.Schema({
+  latitude: Number,
+  longitude: Number,
+});
 
 const restaurantSchema = mongoose.Schema({
   username: String,
@@ -23,6 +27,7 @@ const restaurantSchema = mongoose.Schema({
   password: String,
   token: String,
   address: addressSchema,
+  coordinates: coordinatesSchema,
   siren: String,
   website: String,
   phone: String,
