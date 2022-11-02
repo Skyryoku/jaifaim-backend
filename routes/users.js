@@ -114,6 +114,7 @@ router.get('/getplatsdujour', (req, res) => {
             restaurant: restaurant.name,
             meal: dailyMeal.name,
             src: dailyMeal.src,
+            diets: dailyMeal.diets,
             date: dailyMeal.date,
           };
           //on les push dans le tableau
