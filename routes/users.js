@@ -137,41 +137,60 @@ router.get('/getplatsdujour', (req, res) => {
 // GET plats du jour : pour tous les restaurants de la DB, retourne son nom, son adresse,
 // ses coordonnées, et son dernier plat. Utilisé dans mapScreen.js
 router.get('/platsdujour/read/', (req, res) => {
-  Restaurant.find({}, 'address coordinates name platsdujour').then((data) => {
-    const restaurants = [];
+  Restaurant.find({}, 'address coordinates name platsdujour token').then(
+    (data) => {
+      const restaurants = [];
 
-    data.map((restaurant) => {
-      const { address, coordinates, name, platsdujour } = restaurant;
-      restaurants.push({
-        address,
-        coordinates,
-        dernierPlat: platsdujour[platsdujour.length - 1],
-        name,
+      data.map((restaurant) => {
+        const { address, coordinates, name, platsdujour, token } = restaurant;
+        restaurants.push({
+          address,
+          coordinates,
+          dernierPlat: platsdujour[platsdujour.length - 1],
+          name,
+          token,
+        });
       });
-    });
 
-    res.json({
-      result: true,
-      restaurants: restaurants,
-    });
+      res.json({
+        result: true,
+        restaurants: restaurants,
+      });
+    }
+  );
+});
+
+// GET get restaurant likes
+router.get('/:userToken/likes', async (req, res) => {
+  const { userToken } = req.params;
+
+  const likedRestaurants = await User.findOne(
+    { token: userToken },
+    'collections.likes.restaurants'
+  ).populate('collections.likes.restaurants');
+
+  res.json({
+    result: true,
+    data: likedRestaurants,
+    log: `Returned liked restaurants for token ${userToken} from DB`,
   });
 });
 
 // POST add restaurant to likes
 router.post('/like', async (req, res) => {
-  const { userToken, restaurantUsername } = req.body;
+  const { userToken, restaurantToken } = req.body;
 
   // Si un token user et un username restaurant manquent, arrête-toi ici
-  if (!checkBody(req.body, ['userToken', 'restaurantUsername'])) {
+  if (!checkBody(req.body, ['userToken', 'restaurantToken'])) {
     res.json({
       result: false,
       error: 'Missing or empty fields',
     });
   }
-  // Sinon, trouve l'id d'un restaurant à l'aide de son username
+  // Sinon, trouve l'id d'un restaurant à l'aide de son token
   else {
     const restaurantId = await Restaurant.findOne(
-      { username: restaurantUsername },
+      { token: restaurantToken },
       '_id'
     );
     // Puis ajoute-le à collections.likes.restaurants du user dont j'ai fourni le token
@@ -183,7 +202,42 @@ router.post('/like', async (req, res) => {
     ).then(
       res.json({
         result: true,
-        log: `Success: the restaurant with username: ${restaurantUsername} was liked / added to collections.likes.restaurants in the DB`,
+        log: `Success: the restaurant with token: ${restaurantToken} was liked / added to collections.likes.restaurants in the DB`,
+      })
+    );
+  }
+});
+
+// POST remove restaurant from likes
+router.post('/dislike', async (req, res) => {
+  const { userToken, restaurantToken } = req.body;
+
+  // Si un token user et un username restaurant manquent, arrête-toi ici
+  if (!checkBody(req.body, ['userToken', 'restaurantToken'])) {
+    res.json({
+      result: false,
+      error: 'Missing or empty fields',
+    });
+  }
+  // Sinon, trouve l'id d'un restaurant à l'aide de son token
+  else {
+    const restaurantId = await Restaurant.findOne(
+      { token: restaurantToken },
+      '_id'
+    );
+    // Puis enlève-le à la collections.likes.restaurants du user dont j'ai fourni le token
+    User.updateOne(
+      { token: userToken },
+      {
+        $pull: {
+          'collections.likes.restaurants':
+            mongoose.Types.ObjectId(restaurantId),
+        },
+      }
+    ).then(
+      res.json({
+        result: true,
+        log: `Success: the restaurant with token: ${restaurantToken} was disliked / removed from collections.likes.restaurants in the DB`,
       })
     );
   }
