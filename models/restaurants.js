@@ -34,7 +34,7 @@ const restaurantSchema = mongoose.Schema({
   platsdujour: [platdujourSchema],
   cuisine: [String],
   atmosphere: [String],
-  bookings: String,
+  bookings: [String],
   miscellaneous: [String],
   bioShort: String,
   bioLong: String,
