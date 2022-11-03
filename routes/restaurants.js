@@ -74,7 +74,11 @@ router.post('/signin', (req, res) => {
   Restaurant.findOne({ username: req.body.username }).then((data) => {
     if (data) {
       if (bcrypt.compareSync(req.body.password, data.password)) {
-        res.json({ result: true, token: data.token });
+        res.json({
+          result: true,
+          name: data.name,
+          token: data.token,
+        });
       } else {
         res.json({
           result: false,
