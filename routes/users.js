@@ -9,6 +9,7 @@ const Question = require('../models/questions');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 const { checkBody } = require('../modules/checkBody');
+const { default: mongoose } = require('mongoose');
 
 // POST /INSCRIPTION USER
 router.post('/signup', (req, res) => {
