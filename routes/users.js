@@ -92,9 +92,16 @@ router.post('/signin', (req, res) => {
 
 // POST /SHOW USER DATA
 router.post('/user', (req, res) => {
-  User.findOne({ username: req.body.username }).then((data) => {
-    res.json({ result: true, data });
-  });
+  User.findOne({ username: req.body.username })
+    .populate('collections.likes.restaurants')
+    .populate('collections.bookmarks.restaurants')
+    .populate('collections.visited.restaurants')
+    .then((data) => {
+      res.json({
+        result: true,
+        data,
+      });
+    });
 });
 
 // GET /USER AFFICHE LES RESTAURANTS SI PLATS DU JOUR
@@ -147,6 +154,102 @@ router.get('/platsdujour/read/', (req, res) => {
       restaurants: restaurants,
     });
   });
+});
+
+// POST add restaurant to likes
+router.post('/like', async (req, res) => {
+  const { userToken, restaurantUsername } = req.body;
+
+  // Si un token user et un username restaurant manquent, arrête-toi ici
+  if (!checkBody(req.body, ['userToken', 'restaurantUsername'])) {
+    res.json({
+      result: false,
+      error: 'Missing or empty fields',
+    });
+  }
+  // Sinon, trouve l'id d'un restaurant à l'aide de son username
+  else {
+    const restaurantId = await Restaurant.findOne(
+      { username: restaurantUsername },
+      '_id'
+    );
+    // Puis ajoute-le à collections.likes.restaurants du user dont j'ai fourni le token
+    User.updateOne(
+      { token: userToken },
+      {
+        $addToSet: { 'collections.likes.restaurants': restaurantId },
+      }
+    ).then(
+      res.json({
+        result: true,
+        log: `Success: the restaurant with username: ${restaurantUsername} was liked / added to collections.likes.restaurants in the DB`,
+      })
+    );
+  }
+});
+
+// POST add restaurant to bookmarks
+router.post('/bookmark', async (req, res) => {
+  const { userToken, restaurantUsername } = req.body;
+
+  // Si un token user et un username restaurant manquent, arrête-toi ici
+  if (!checkBody(req.body, ['userToken', 'restaurantUsername'])) {
+    res.json({
+      result: false,
+      error: 'Missing or empty fields',
+    });
+  }
+  // Sinon, trouve l'id d'un restaurant à l'aide de son username
+  else {
+    const restaurantId = await Restaurant.findOne(
+      { username: restaurantUsername },
+      '_id'
+    );
+    // Puis ajoute-le à collections.likes.restaurants du user dont j'ai fourni le token
+    User.updateOne(
+      { token: userToken },
+      {
+        $addToSet: { 'collections.bookmarks.restaurants': restaurantId },
+      }
+    ).then(
+      res.json({
+        result: true,
+        log: `Success: the restaurant with username: ${restaurantUsername} was bookmarked / added to collections.bookmarks.restaurants in the DB`,
+      })
+    );
+  }
+});
+
+// POST add restaurant to visited
+router.post('/visited', async (req, res) => {
+  const { userToken, restaurantUsername } = req.body;
+
+  // Si un token user et un username restaurant manquent, arrête-toi ici
+  if (!checkBody(req.body, ['userToken', 'restaurantUsername'])) {
+    res.json({
+      result: false,
+      error: 'Missing or empty fields',
+    });
+  }
+  // Sinon, trouve l'id d'un restaurant à l'aide de son username
+  else {
+    const restaurantId = await Restaurant.findOne(
+      { username: restaurantUsername },
+      '_id'
+    );
+    // Puis ajoute-le à collections.likes.restaurants du user dont j'ai fourni le token
+    User.updateOne(
+      { token: userToken },
+      {
+        $addToSet: { 'collections.visited.restaurants': restaurantId },
+      }
+    ).then(
+      res.json({
+        result: true,
+        log: `Success: the restaurant with username: ${restaurantUsername} was marked as visited / added to collections.visited.restaurants in the DB`,
+      })
+    );
+  }
 });
 
 // POST /USER POSE UNE QUESTION
