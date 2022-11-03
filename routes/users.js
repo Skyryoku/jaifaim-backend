@@ -120,6 +120,7 @@ router.get('/getplatsdujour', (req, res) => {
           //on crée des objets comprenant les données à récupérer
           let pdj = {
             restaurant: restaurant.name,
+            restaurantToken: restaurant.token,
             meal: dailyMeal.name,
             src: dailyMeal.src,
             diets: dailyMeal.diets,
